@@ -13,3 +13,29 @@
 .rounded {
   border-radius: 999em;
 }
+
+.btn-grad {
+  background-image: linear-gradient(to right, #f46b45 0%, #eea849 51%, #f46b45 100%);
+  margin: 10px;
+  padding: 15px 45px;
+  text-align: center;
+  transition: 0.5s;
+  background-size: 200% auto;
+  color: white;
+  display: block;
+}
+
+.btn-grad:hover {
+  background-position: right center;
+  color: #fff;
+  text-decoration: none;
+}
+
+.text-grad {
+  background: linear-gradient(to right, #f32170, #ff6b08, #cf23cf, #f32170);
+  -webkit-text-fill-color: transparent;
+  -webkit-background-clip: text;
+  background-clip: text;
+  /* EBLE - jogar em outra classe */
+  font-weight: 600;
+}

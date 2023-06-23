@@ -1,7 +1,7 @@
 <template>
   <q-page class="row items-center align-center justify-center column">
     <h2 class="font-google-sans">
-      <span class="q-px-md">Merge</span>my pdf :)
+      <span class="q-px-md text-grad">Split</span>my pdf :)
     </h2>
     <div class="row justify-center full-width">
       <div class="col col-6">
@@ -9,28 +9,29 @@
           borderless
           color="orange"
           counter
-          max-files="200"
-          multiple
           hide-hint
           :use-chips="true"
-          label="Click to add"
+          label="Click select pdf"
           outlined
-          v-model="filesList"
+          v-model="filesListOne"
           accept=".pdf"
           @click="resetButton"
         ></q-file>
+
+        <q-input v-model="pageIntervals" outlined type="text" />
       </div>
     </div>
-    <div v-if="!showButtons" class="row q-mt-md">
+
+    <div class="row q-mt-md">
       <q-btn
         :loading="loading"
-        @click="mergePdfs"
-        class="bg-deep-orange-10 rounded"
+        @click="splitPdf"
+        class="btn-grad rounded"
         text-color="white"
-        size="xl"
+        size="lg"
         rounded
         no-caps
-        ><span class="font-google-sans">Merge pdfs</span></q-btn
+        ><span class="font-google-sans-text">Split pdf</span></q-btn
       >
     </div>
 
@@ -47,20 +48,39 @@
 
 <script setup lang="ts">
 import { ref } from 'vue';
-import { PdfMergerAdapter } from '../adapters/PdfMerger.adapter';
+import createAnchor from '../utils/createAnchor';
+import { PdfSplitAdapter } from '../adapters/PdfSplit.adapter';
 
-const filesList = ref<File[]>([]);
+const filesListOne = ref<File>();
 
 const fileName = ref<string>('file name');
 
 const showButtons = ref<boolean>(false);
 
+const pageIntervals = ref<string>('');
+
 let url = ref<string>('');
 
 let loading = ref<boolean>(false);
 
-// Notas
-// https://oieduardorabelo.medium.com/javascript-armadilhas-do-asyn-await-em-loops-1cdad44db7f0
+async function splitPdf() {
+  if (filesListOne.value) {
+    const pdfSplitAdapter = new PdfSplitAdapter(filesListOne.value, [
+      { start: 1, end: 9 },
+      { start: 10, end: 19 },
+    ]);
+
+    console.log(pdfSplitAdapter);
+
+    const file = await pdfSplitAdapter.getFileAsBlob();
+
+    if (file) {
+      url.value = URL.createObjectURL(file);
+
+      createAnchor({ url: url.value, fileName: fileName.value });
+    }
+  }
+}
 
 function viewPdfOnAnotherWindow(url: string) {
   window.open(url);
@@ -76,22 +96,6 @@ function resetButton() {
   }
 }
 
-function createAnchor(url: string) {
-  const wrapper = document.querySelector('.link-wrapper');
-
-  const a = document.createElement('a');
-
-  a.classList.add('anchor');
-
-  a.href = url;
-
-  a.download = fileName.value || 'download';
-
-  a.innerText = `Download ${fileName.value}`;
-
-  wrapper?.appendChild(a);
-}
-
 function removeAnchor(element: Element) {
   element.remove();
 }
@@ -99,32 +103,11 @@ function removeAnchor(element: Element) {
 function setShowButtons(status: boolean) {
   showButtons.value = status;
 }
-
-async function mergePdfs() {
-  if (filesList.value.length > 0) {
-    const pdfMergerAdapter = new PdfMergerAdapter(
-      filesList.value,
-      fileName.value
-    );
-
-    try {
-      await pdfMergerAdapter.addPdfFile();
-
-      const file = await pdfMergerAdapter.saveAsBlob();
-
-      url.value = URL.createObjectURL(file);
-
-      setShowButtons(true);
-
-      createAnchor(url.value);
-    } finally {
-    }
-  }
-}
 </script>
 
 <style lang="scss" scoped>
 /* .body--light {
+  
 } */
 
 /* .body--dark {

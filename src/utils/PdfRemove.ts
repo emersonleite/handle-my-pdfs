@@ -1,37 +1,40 @@
 import { PDFDocument } from 'pdf-lib';
+import { IPageInterval } from 'src/interfaces/IPageInterval';
+import { HandlePdf } from './HandlePdf';
 
-export class PdfRemove {
-  private fileAsBlob: Blob;
+export class PdfRemove extends HandlePdf {
+  fileAsUint8Array: Uint8Array | null = null;
 
-  private pagesToRemove: number[];
-
-  constructor(pdfFile: File, pagesToRemove: number[]) {
-    this.fileAsBlob = new Blob([pdfFile], { type: 'application/pdf' });
-
-    this.pagesToRemove = pagesToRemove.sort((a, b) => b - a);
+  constructor(pdfFile: File, pageInterval: IPageInterval[]) {
+    super(pdfFile, pageInterval);
   }
 
-  async removePage() {
+  async handlePdf(): Promise<void> {
     try {
       const fileAsArrayBuffer = await this.fileAsBlob.arrayBuffer();
 
       const documentToRemovePages = await PDFDocument.load(fileAsArrayBuffer);
 
-      for (const page of this.pagesToRemove) {
-        documentToRemovePages.removePage(page);
+      for (const page of this.pageInterval) {
+        let pageToRemove = page.end;
+        while (pageToRemove >= page.start) {
+          documentToRemovePages.removePage(pageToRemove);
+          pageToRemove--;
+        }
       }
 
-      const newDocument = await documentToRemovePages.save();
-
-      this.fileAsBlob = new Blob([newDocument.buffer], {
-        type: 'application/pdf',
-      });
+      this.fileAsUint8Array = await documentToRemovePages.save();
     } catch (err) {
-      console.log(err);
+      console.error(err);
     }
   }
 
-  async saveAsBlob(): Promise<Blob> {
-    return this.fileAsBlob;
+  async getFileAsBlob(): Promise<Blob | null> {
+    if (this.fileAsUint8Array) {
+      return new Blob([this.fileAsUint8Array.buffer], {
+        type: 'application/pdf',
+      });
+    }
+    return null;
   }
 }

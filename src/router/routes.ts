@@ -7,8 +7,20 @@ const routes: RouteRecordRaw[] = [
     children: [
       {
         path: '',
-        name: 'index-page',
-        component: () => import('pages/IndexPage.vue'),
+        name: 'merge-pdf',
+        component: () => import('src/pages/MergePdf.vue'),
+      },
+    ],
+  },
+
+  {
+    path: '/split-pdf',
+    component: () => import('layouts/MainLayout.vue'),
+    children: [
+      {
+        path: '',
+        name: 'split-pdf',
+        component: () => import('pages/SplitPdf.vue'),
       },
     ],
   },
@@ -20,7 +32,7 @@ const routes: RouteRecordRaw[] = [
       {
         path: '',
         name: 'remove-page',
-        component: () => import('pages/RemovePage.vue'),
+        component: () => import('src/pages/RemoveFromPdf.vue'),
       },
     ],
   },

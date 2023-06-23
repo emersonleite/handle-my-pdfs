@@ -1,13 +1,13 @@
-import { PdfRemove } from 'src/utils/PdfRemove';
+import { PdfSplit } from 'src/utils/PdfSplit';
 import { PdfHandleAdapter } from './pdfHandleAdapter';
 import { IPageInterval } from 'src/interfaces/IPageInterval';
 
-export class PdfRemoveAdapter extends PdfHandleAdapter {
-  private adapter: PdfRemove;
+export class PdfSplitAdapter extends PdfHandleAdapter {
+  private adapter: PdfSplit;
 
   constructor(pdfFile: File, pageInterval: IPageInterval[]) {
     super();
-    this.adapter = new PdfRemove(pdfFile, pageInterval);
+    this.adapter = new PdfSplit(pdfFile, pageInterval);
   }
 
   async handlePdf(): Promise<void> {

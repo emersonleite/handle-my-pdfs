@@ -28,6 +28,8 @@
     "eslint": "^8.10.0",
     "eslint-config-prettier": "^8.1.0",
     "eslint-plugin-vue": "^9.0.0",
+    "file-saver": "^2.0.5",
+    "jszip": "^3.10.1",
     "pdf-lib": "^1.17.1",
     "pdf-merger-js": "^4.3.0",
     "prettier": "^2.5.1",

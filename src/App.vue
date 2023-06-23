@@ -3,9 +3,15 @@
     <q-header class="bg-grey-10">
       <div class="row">
         <q-btn @click="changeTheme">Change Theme</q-btn>
-        <q-item :to="{ name: 'index-page' }">Merge</q-item>
-        <q-item :to="{ name: 'remove-page' }">Split</q-item>
-        <q-item :to="{ name: 'remove-page' }">Remove</q-item>
+        <q-item class="font-google-sans-mono" :to="{ name: 'merge-pdf' }"
+          >Merge</q-item
+        >
+        <q-item class="font-google-sans-mono" :to="{ name: 'split-pdf' }"
+          >Split</q-item
+        >
+        <q-item class="font-google-sans-mono" :to="{ name: 'remove-page' }"
+          >Remove</q-item
+        >
       </div>
     </q-header>
     <router-view />

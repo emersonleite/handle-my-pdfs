@@ -1,7 +1,7 @@
 <template>
   <q-page class="row items-center align-center justify-center column">
     <h2 class="font-google-sans">
-      <span class="q-px-md">Remove</span>from my pdf :)
+      <span class="q-px-md text-grad">Merge</span>my pdf :)
     </h2>
     <div class="row justify-center full-width">
       <div class="col col-6">
@@ -9,27 +9,28 @@
           borderless
           color="orange"
           counter
+          max-files="200"
+          multiple
           hide-hint
           :use-chips="true"
-          label="Click to remove pages"
+          label="Click select pdf"
           outlined
-          v-model="filesListOne"
+          v-model="filesList"
           accept=".pdf"
           @click="resetButton"
         ></q-file>
       </div>
     </div>
-
-    <div class="row q-mt-md">
+    <div v-if="!showButtons" class="row q-mt-md">
       <q-btn
         :loading="loading"
-        @click="removePage"
-        class="bg-deep-orange-10 rounded"
+        @click="mergePdfs"
+        class="btn-grad rounded"
         text-color="white"
-        size="xl"
+        size="lg"
         rounded
         no-caps
-        ><span class="font-google-sans-text">Remove pages</span></q-btn
+        ><span class="font-google-sans">Merge pdfs</span></q-btn
       >
     </div>
 
@@ -46,10 +47,10 @@
 
 <script setup lang="ts">
 import { ref } from 'vue';
+import { PdfMergerAdapter } from '../adapters/PdfMerger.adapter';
+import createAnchor from '../utils/createAnchor';
 
-import { PdfRemoveAdapter } from '../adapters/PdfRemove.adapter';
-
-const filesListOne = ref<File>();
+const filesList = ref<File[]>([]);
 
 const fileName = ref<string>('file name');
 
@@ -58,18 +59,6 @@ const showButtons = ref<boolean>(false);
 let url = ref<string>('');
 
 let loading = ref<boolean>(false);
-
-async function removePage() {
-  const pdfRemoveAdapter = new PdfRemoveAdapter(filesListOne.value, [0]);
-
-  await pdfRemoveAdapter.removePage();
-
-  const file = await pdfRemoveAdapter.saveAsBlob();
-
-  url.value = URL.createObjectURL(file);
-
-  createAnchor(url.value);
-}
 
 function viewPdfOnAnotherWindow(url: string) {
   window.open(url);
@@ -85,22 +74,6 @@ function resetButton() {
   }
 }
 
-function createAnchor(url: string) {
-  const wrapper = document.querySelector('.link-wrapper');
-
-  const a = document.createElement('a');
-
-  a.classList.add('anchor');
-
-  a.href = url;
-
-  a.download = fileName.value || 'download';
-
-  a.innerText = `Download ${fileName.value}`;
-
-  wrapper?.appendChild(a);
-}
-
 function removeAnchor(element: Element) {
   element.remove();
 }
@@ -108,11 +81,30 @@ function removeAnchor(element: Element) {
 function setShowButtons(status: boolean) {
   showButtons.value = status;
 }
+
+async function mergePdfs() {
+  if (filesList.value.length > 0) {
+    try {
+      const pdfMerger = new PdfMergerAdapter(filesList.value);
+
+      const file = await pdfMerger.getFileAsBlob();
+
+      if (file) {
+        url.value = URL.createObjectURL(file);
+
+        createAnchor({ url: url.value, fileName: fileName.value });
+
+        setShowButtons(true);
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  }
+}
 </script>
 
 <style lang="scss" scoped>
 /* .body--light {
-  
 } */
 
 /* .body--dark {

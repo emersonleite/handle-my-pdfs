@@ -1,17 +1,21 @@
 import { PdfMerger } from 'src/utils/PdfMerger';
+/* import { PdfMergerSubstitute as PdfMerger } from 'src/utils/PdfMerger'; */
+import { PdfHandleAdapter } from './pdfHandleAdapter';
 
-export class PdfMergerAdapter {
+export class PdfMergerAdapter extends PdfHandleAdapter {
   private adapter: PdfMerger;
 
-  constructor(filesList: File[], outputFileName: string) {
-    this.adapter = new PdfMerger(filesList, outputFileName);
+  constructor(filesList: File[]) {
+    super();
+    this.adapter = new PdfMerger(filesList);
   }
 
-  async addPdfFile() {
-    await this.adapter.addPdfFile();
+  async handlePdf(): Promise<void> {
+    await this.adapter.handlePdf();
   }
 
-  async saveAsBlob(): Promise<Blob> {
-    return await this.adapter.saveAsBlob();
+  async getFileAsBlob(): Promise<Blob | null> {
+    await this.handlePdf();
+    return await this.adapter.getFileAsBlob();
   }
 }
